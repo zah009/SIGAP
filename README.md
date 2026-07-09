@@ -38,3 +38,40 @@ copy env .env
 ```
 
 Edit `.env`, sesuaikan bagian database:
+database.default.hostname = localhost
+database.default.database = sigap_db
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+
+
+Buat database `sigap_db` lewat phpMyAdmin, lalu jalankan migration:
+```bash
+php spark migrate
+php spark db:seed UserSeeder
+```
+
+Jalankan server:
+```bash
+php spark serve
+```
+
+Akses di `http://localhost:8080`.
+
+## Kredensial Testing
+
+| Role  | Username    | Password  |
+|-------|-------------|-----------|
+| Admin | testadmin   | test123   |
+| User  | user1       | user123   |
+
+## Roadmap
+
+- [ ] Styling dengan Tailwind CSS
+- [ ] Notifikasi email saat status tiket berubah
+- [ ] Upload lampiran file pada tiket
+- [ ] Deployment ke AWS EC2
+
+## Lisensi
+
+MIT License — lihat [LICENSE](./LICENSE).
