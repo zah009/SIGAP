@@ -31,10 +31,9 @@ Detail rancangan (requirement analysis, ERD, flowchart, rencana pengujian) ada d
 **Prasyarat:** PHP 8.2+, Composer, MySQL (disarankan lewat XAMPP), extension `intl` dan `zip` aktif.
 
 ```bash
-git clone https://github.com/zah009/SIGAP.git
-cd SIGAP
-composer install
-copy env .env
+php spark migrate
+php spark db:seed UserSeeder
+php spark db:seed RegularUserSeeder
 ```
 
 Edit `.env`, sesuaikan bagian database:
