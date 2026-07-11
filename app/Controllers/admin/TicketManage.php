@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\TicketModel;
 use App\Models\TicketLogModel;
+use App\Models\UserModel;
 
 class TicketManage extends BaseController
 {
@@ -57,7 +58,36 @@ class TicketManage extends BaseController
             'catatan'   => $catatan,
         ]);
 
+        $this->notifyUser($ticket, $status, $catatan);
+
         session()->setFlashdata('success', 'Status tiket berhasil diupdate.');
         return redirect()->to('/admin/tickets/' . $id);
+    }
+
+    private function notifyUser($ticket, $status, $catatan)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($ticket['user_id']);
+
+        if (empty($user['email'])) {
+            log_message('info', 'Email tidak dikirim: user tidak punya alamat email.');
+            return;
+        }
+
+        $email = \Config\Services::email();
+        $email->setTo($user['email']);
+        $email->setSubject('Update Tiket: ' . $ticket['judul']);
+        $email->setMessage(
+            "Halo {$user['nama_lengkap']},\n\n" .
+            "Status laporan Anda \"{$ticket['judul']}\" telah diperbarui menjadi: {$status}.\n\n" .
+            "Catatan dari tim IT:\n{$catatan}\n\n" .
+            "— SIGAP"
+        );
+
+        try {
+            $email->send();
+        } catch (\Exception $e) {
+            log_message('error', 'Gagal kirim email: ' . $e->getMessage());
+        }
     }
 }

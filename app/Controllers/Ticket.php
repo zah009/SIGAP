@@ -13,13 +13,27 @@ class Ticket extends BaseController
         $this->ticketModel = new TicketModel();
     }
 
-    public function create()
+    private function blockAdmin()
     {
-        return view('tickets/create');
+        if (session()->get('role') === 'admin') {
+            return redirect()->to('/admin/dashboard')
+                ->with('error', 'Admin tidak membuat laporan, khusus kelola tiket pengguna.');
+        }
+        return null;
     }
+
+    public function create()
+{
+    
+
+    if ($block = $this->blockAdmin()) return $block;
+    return view('tickets/create');
+}
 
     public function store()
     {
+        if ($block = $this->blockAdmin()) return $block;
+
         $rules = [
             'kategori'  => 'required|in_list[hardware,software,jaringan,akun]',
             'judul'     => 'required|min_length[5]|max_length[150]',
@@ -46,11 +60,16 @@ class Ticket extends BaseController
 
     public function myTickets()
     {
+        if ($block = $this->blockAdmin()) return $block;
+
         $tickets = $this->ticketModel
             ->where('user_id', session()->get('user_id'))
             ->orderBy('created_at', 'DESC')
-            ->findAll();
+            ->paginate(10);
 
-        return view('tickets/index', ['tickets' => $tickets]);
+        return view('tickets/index', [
+            'tickets' => $tickets,
+            'pager'   => $this->ticketModel->pager,
+        ]);
     }
 }

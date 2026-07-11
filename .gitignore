@@ -130,3 +130,4 @@ _modules/*
 !/writable/index.html
 .env
 /public/assets/css/app.css
+*.exe

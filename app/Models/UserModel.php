@@ -12,12 +12,13 @@ class UserModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
 
-    protected $allowedFields = ['username', 'password_hash', 'role', 'nama_lengkap', 'created_at'];
+    protected $allowedFields = ['username', 'email', 'password_hash', 'role', 'nama_lengkap', 'created_at'];
 
-    protected $useTimestamps = false; 
+    protected $useTimestamps = false;
 
     protected $validationRules = [
         'username'      => 'required|min_length[4]|max_length[50]|is_unique[users.username,id,{id}]',
+        'email'         => 'permit_empty|valid_email',
         'nama_lengkap'  => 'required|max_length[100]',
         'role'          => 'required|in_list[user,admin]',
     ];

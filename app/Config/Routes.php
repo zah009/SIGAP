@@ -18,4 +18,8 @@ use CodeIgniter\Router\RouteCollection;
         $routes->get('dashboard', 'Admin\Dashboard::index');
         $routes->get('tickets/(:num)', 'Admin\TicketManage::show/$1');
         $routes->post('tickets/(:num)/update', 'Admin\TicketManage::updateStatus/$1');
+
+        $routes->get('users', 'Admin\UserManage::index');
+        $routes->get('users/create', 'Admin\UserManage::create');
+        $routes->post('users/store', 'Admin\UserManage::store');
 });

@@ -1,42 +1,43 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Buat Tiket - SIGAP</title>
-</head>
-<body>
+<?= $this->include('partials/header', ['title' => 'Buat Laporan - SIGAP']) ?>
 
-    <h1>Buat Laporan Gangguan</h1>
+<h1 class="text-2xl font-bold mb-6">Buat Laporan Gangguan</h1>
 
-    <?php if (session()->getFlashdata('errors')): ?>
-        <ul style="color:red;">
-            <?php foreach (session()->getFlashdata('errors') as $error): ?>
-                <li><?= esc($error) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+<?php if (session()->getFlashdata('errors')): ?>
+    <ul class="bg-red-50 text-red-700 text-sm rounded-md px-4 py-3 mb-4 list-disc list-inside">
+        <?php foreach (session()->getFlashdata('errors') as $error): ?>
+            <li><?= esc($error) ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
 
-    <form action="/tickets/store" method="post">
-        <?= csrf_field() ?>
+<form action="/tickets/store" method="post" class="bg-white p-6 rounded-lg shadow-sm max-w-lg">
+    <?= csrf_field() ?>
 
-        <label>Kategori</label><br>
-        <select name="kategori">
-            <option value="hardware">Hardware</option>
-            <option value="software">Software</option>
-            <option value="jaringan">Jaringan</option>
-            <option value="akun">Akun/Akses</option>
-        </select><br><br>
+    <div class="mb-4">
+    <label class="block text-sm font-medium mb-1">Kategori</label>
+    <select name="kategori" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+        <option value="hardware" <?= old('kategori') === 'hardware' ? 'selected' : '' ?>>Hardware</option>
+        <option value="software" <?= old('kategori') === 'software' ? 'selected' : '' ?>>Software</option>
+        <option value="jaringan" <?= old('kategori') === 'jaringan' ? 'selected' : '' ?>>Jaringan</option>
+        <option value="akun" <?= old('kategori') === 'akun' ? 'selected' : '' ?>>Akun/Akses</option>
+    </select>
+</div>
 
-        <label>Judul</label><br>
-        <input type="text" name="judul" value="<?= esc(old('judul')) ?>"><br><br>
+    <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Judul</label>
+        <input type="text" name="judul" value="<?= esc(old('judul')) ?>"
+               class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
 
-        <label>Deskripsi</label><br>
-        <textarea name="deskripsi" rows="5"><?= esc(old('deskripsi')) ?></textarea><br><br>
+    <div class="mb-6">
+        <label class="block text-sm font-medium mb-1">Deskripsi</label>
+        <textarea name="deskripsi" rows="5"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"><?= esc(old('deskripsi')) ?></textarea>
+    </div>
 
-        <button type="submit">Kirim Laporan</button>
-    </form>
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-md transition">
+        Kirim Laporan
+    </button>
+</form>
 
-    <p><a href="/dashboard">Kembali</a></p>
-
-</body>
-</html>
+<?= $this->include('partials/footer') ?>
