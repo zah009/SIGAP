@@ -9,13 +9,23 @@ class Dashboard extends BaseController
     public function index()
     {
         $ticketModel = new TicketModel();
+        $userId = session()->get('user_id');
 
         $summary = [
-            'open'        => $ticketModel->where('user_id', session()->get('user_id'))->where('status', 'open')->countAllResults(),
-            'in_progress' => $ticketModel->where('user_id', session()->get('user_id'))->where('status', 'in_progress')->countAllResults(),
-            'closed'      => $ticketModel->where('user_id', session()->get('user_id'))->where('status', 'closed')->countAllResults(),
+            'open'        => $ticketModel->where('user_id', $userId)->where('status', 'open')->countAllResults(),
+            'in_progress' => $ticketModel->where('user_id', $userId)->where('status', 'in_progress')->countAllResults(),
+            'closed'      => $ticketModel->where('user_id', $userId)->where('status', 'closed')->countAllResults(),
         ];
 
-        return view('dashboard', ['summary' => $summary]);
+        $recentTickets = $ticketModel
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'DESC')
+            ->limit(5)
+            ->find();
+
+        return view('dashboard', [
+            'summary'       => $summary,
+            'recentTickets' => $recentTickets,
+        ]);
     }
 }

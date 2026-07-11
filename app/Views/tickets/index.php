@@ -22,6 +22,7 @@
                     <th class="px-4 py-3">Kategori</th>
                     <th class="px-4 py-3">Status</th>
                     <th class="px-4 py-3">Dibuat</th>
+                    <th class="px-4 py-3">Lampiran</th>
                 </tr>
             </thead>
             <tbody class="divide-y">
@@ -38,6 +39,13 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-gray-500"><?= esc($t['created_at']) ?></td>
+                        <td class="px-4 py-3">
+                            <?php if (!empty($t['lampiran'])): ?>
+                                <a href="/uploads/tickets/<?= esc($t['lampiran']) ?>" target="_blank" class="text-blue-600 hover:underline">📎 Lihat</a>
+                            <?php else: ?>
+                                <span class="text-gray-300">—</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -8,27 +8,67 @@ Departemen IT di banyak perusahaan masih menerima laporan gangguan secara tidak 
 
 ## Fitur
 
+**Autentikasi & Akses**
 - Autentikasi berbasis session dengan role `user` dan `admin`
-- User dapat membuat laporan gangguan (kategori, judul, deskripsi) dan memantau statusnya
-- Admin dapat melihat seluruh tiket, mengubah status (`open` → `in_progress` → `closed`)
-- Setiap perubahan status **wajib disertai catatan penanganan**, tersimpan sebagai riwayat terpisah per tiket
-- Proteksi akses berbasis role lewat Filter (route admin tidak bisa diakses user biasa maupun yang belum login)
+- Proteksi akses berbasis role lewat Filter (route admin tidak bisa diakses user biasa maupun yang belum login, teruji di dua skenario: belum login dan login-tapi-salah-role)
+- Proteksi CSRF aktif di seluruh form
+
+**Untuk User**
+- Membuat laporan gangguan (kategori, judul, deskripsi) lengkap dengan lampiran file (JPG/PNG/PDF, maks 2MB)
+- Memantau status laporan sendiri lewat dashboard dan riwayat laporan
+- Notifikasi email otomatis saat status laporan diperbarui admin
+
+**Untuk Admin**
+- Melihat seluruh tiket dari semua user, dengan ringkasan jumlah per status
+- Mengubah status tiket (`open` → `in_progress` → `closed`), **wajib disertai catatan penanganan** — tersimpan sebagai riwayat terpisah per tiket (audit trail)
+- Mengelola akun user (tambah user baru)
+- Admin sengaja **tidak bisa** membuat laporan untuk dirinya sendiri — keputusan desain, karena tiket merepresentasikan kesenjangan pengetahuan teknis antara pelapor dan penyelesai
+
+**Keamanan**
+- Password di-hash dengan bcrypt (`password_hash`)
+- Validasi upload file: pengecekan MIME type asli (bukan sekadar ekstensi), nama file diacak (`getRandomName()`) untuk mencegah path traversal dan penimpaan file, serta `.htaccess` di folder upload untuk mencegah eksekusi file selain gambar/PDF
+- Query database via Query Builder CodeIgniter (aman dari SQL injection)
 
 ## Tech Stack
 
 - **Backend:** PHP 8.2, CodeIgniter 4
 - **Database:** MySQL/MariaDB (XAMPP untuk development)
-- **Frontend:** HTML, (Tailwind CSS — dalam pengembangan)
+- **Frontend:** HTML, Tailwind CSS v4 (standalone CLI)
+- **Email:** CodeIgniter Email Service (SMTP, testing via Mailtrap)
 
 ## Struktur Database
 
-3 tabel utama: `users`, `tickets`, `ticket_logs`. Relasi 1:n dari `users` ke `tickets`, dan 1:n dari `tickets` ke `ticket_logs`. `ticket_logs` sengaja dipisah dari `tickets` agar riwayat penanganan tetap tersimpan meski status akhir tiket berubah.
+4 tabel utama: `users` (dengan kolom `email` untuk notifikasi), `tickets`, `ticket_logs`. Relasi 1:n dari `users` ke `tickets`, dan 1:n dari `tickets` ke `ticket_logs`. `ticket_logs` sengaja dipisah dari `tickets` agar riwayat penanganan tetap tersimpan meski status akhir tiket berubah.
 
-Detail rancangan (requirement analysis, ERD, flowchart, rencana pengujian) ada di [dokumen rancangan sistem](./docs/SIGAP_Dokumen_Rancangan.pdf).
+Detail rancangan awal (requirement analysis, ERD, flowchart, rencana pengujian) ada di [dokumen rancangan sistem](./docs/SIGAP_Dokumen_Rancangan.pdf).
 
 ## Instalasi Lokal
 
 **Prasyarat:** PHP 8.2+, Composer, MySQL (disarankan lewat XAMPP), extension `intl` dan `zip` aktif.
+
+```bash
+git clone https://github.com/zah009/SIGAP.git
+cd SIGAP
+composer install
+copy env .env
+```
+
+Buat database `sigap_db` lewat phpMyAdmin, lalu edit `.env`, sesuaikan bagian berikut:
+database.default.hostname = localhost
+database.default.database = sigap_db
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+
+**(Opsional)** Untuk fitur notifikasi email, tambahkan konfigurasi SMTP (contoh pakai [Mailtrap](https://mailtrap.io) untuk testing):
+email.protocol = smtp
+email.SMTPHost = sandbox.smtp.mailtrap.io
+email.SMTPUser = [username]
+email.SMTPPass = [password]
+email.SMTPPort = 2525
+email.SMTPCrypto = tls
+
+Jalankan migration dan seeder:
 
 ```bash
 php spark migrate
@@ -36,21 +76,8 @@ php spark db:seed UserSeeder
 php spark db:seed RegularUserSeeder
 ```
 
-Edit `.env`, sesuaikan bagian database:
-database.default.hostname = localhost
-database.default.database = sigap_db
-database.default.username = root
-database.default.password =
-database.default.DBDriver = MySQLi
-
-
-Buat database `sigap_db` lewat phpMyAdmin, lalu jalankan migration:
-```bash
-php spark migrate
-php spark db:seed UserSeeder
-```
-
 Jalankan server:
+
 ```bash
 php spark serve
 ```
@@ -59,17 +86,20 @@ Akses di `http://localhost:8080`.
 
 ## Kredensial Testing
 
-| Role  | Username    | Password  |
-|-------|-------------|-----------|
-| Admin | testadmin   | test123   |
-| User  | user1       | user123   |
+| Role  | Username  | Password |
+| ----- | --------- | -------- |
+| Admin | testadmin | test123  |
+| User  | user1     | user123  |
 
 ## Roadmap
 
-- [ ] Styling dengan Tailwind CSS
-- [ ] Notifikasi email saat status tiket berubah
-- [ ] Upload lampiran file pada tiket
+- [x] Styling dengan Tailwind CSS
+- [x] Notifikasi email saat status tiket berubah
+- [x] Upload lampiran file pada tiket
+- [x] Manajemen user oleh admin
 - [ ] Deployment ke AWS EC2
+- [ ] Rate limiting pada percobaan login (mencegah brute-force)
+- [ ] Reset password lewat email (saat ini admin menentukan password awal user secara langsung)
 
 ## Lisensi
 

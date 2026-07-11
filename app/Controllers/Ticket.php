@@ -30,33 +30,58 @@ class Ticket extends BaseController
     return view('tickets/create');
 }
 
-    public function store()
-    {
-        if ($block = $this->blockAdmin()) return $block;
+public function store()
+{
+    if ($block = $this->blockAdmin()) return $block;
 
-        $rules = [
-            'kategori'  => 'required|in_list[hardware,software,jaringan,akun]',
-            'judul'     => 'required|min_length[5]|max_length[150]',
-            'deskripsi' => 'required|min_length[10]',
-        ];
+    $rules = [
+        'kategori'  => 'required|in_list[hardware,software,jaringan,akun]',
+        'judul'     => 'required|min_length[5]|max_length[150]',
+        'deskripsi' => 'required|min_length[10]',
+    ];
 
-        if (!$this->validate($rules)) {
+    if (!$this->validate($rules)) {
+        return redirect()->to('/tickets/create')
+            ->withInput()
+            ->with('errors', $this->validator->getErrors());
+    }
+
+    $lampiranName = null;
+    $file = $this->request->getFile('lampiran');
+
+    if ($file && $file->isValid() && !$file->hasMoved()) {
+
+        $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
+        $realMime = $file->getMimeType();
+
+        if (!in_array($realMime, $allowedMimes, true)) {
             return redirect()->to('/tickets/create')
                 ->withInput()
-                ->with('errors', $this->validator->getErrors());
+                ->with('errors', ['Format lampiran tidak diizinkan. Hanya JPG, PNG, atau PDF yang boleh diupload.']);
         }
 
-        $this->ticketModel->insert([
-            'user_id'   => session()->get('user_id'),
-            'kategori'  => $this->request->getPost('kategori'),
-            'judul'     => $this->request->getPost('judul'),
-            'deskripsi' => $this->request->getPost('deskripsi'),
-            'status'    => 'open',
-        ]);
+        if ($file->getSize() > 2048 * 1024) {
+            return redirect()->to('/tickets/create')
+                ->withInput()
+                ->with('errors', ['Ukuran lampiran maksimal 2MB.']);
+        }
 
-        session()->setFlashdata('success', 'Tiket berhasil dibuat.');
-        return redirect()->to('/dashboard');
+        $lampiranName = $file->getRandomName();
+        $file->move(FCPATH . 'uploads/tickets', $lampiranName);
     }
+
+    $this->ticketModel->insert([
+        'user_id'   => session()->get('user_id'),
+        'kategori'  => $this->request->getPost('kategori'),
+        'judul'     => $this->request->getPost('judul'),
+        'deskripsi' => $this->request->getPost('deskripsi'),
+        'status'    => 'open',
+        'lampiran'  => $lampiranName,
+    ]);
+
+    session()->setFlashdata('success', 'Tiket berhasil dibuat.');
+    return redirect()->to('/dashboard');
+}
 
     public function myTickets()
     {

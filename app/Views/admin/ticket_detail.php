@@ -18,6 +18,13 @@
         <?php endif; ?>
     </p>
     <p class="text-gray-700"><?= esc($ticket['deskripsi']) ?></p>
+    <?php if (!empty($ticket['lampiran'])): ?>
+    <p class="mt-3">
+        <a href="/uploads/tickets/<?= esc($ticket['lampiran']) ?>" target="_blank" class="text-primary hover:underline text-sm">
+            📎 Lihat Lampiran
+        </a>
+    </p>
+<?php endif; ?>
 </div>
 
 <?php if (session()->getFlashdata('error')): ?>

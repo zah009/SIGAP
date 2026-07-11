@@ -20,7 +20,11 @@ class TicketManage extends BaseController
 
     public function show($id)
     {
-        $ticket = $this->ticketModel->find($id);
+        $ticket = $this->ticketModel
+            ->select('tickets.*, users.username, users.nama_lengkap, users.email as reporter_email')
+            ->join('users', 'users.id = tickets.user_id')
+            ->where('tickets.id', $id)
+            ->first();
 
         if (!$ticket) {
             return redirect()->to('/admin/dashboard')->with('error', 'Tiket tidak ditemukan.');
