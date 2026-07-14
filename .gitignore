@@ -129,7 +129,7 @@ _modules/*
 !/writable/.htaccess
 !/writable/index.html
 .env
-/public/assets/css/app.css
+
 *.exe
 public/uploads/tickets/*
 !public/uploads/tickets/.gitkeep
