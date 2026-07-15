@@ -7,6 +7,10 @@ use CodeIgniter\Router\RouteCollection;
     $routes->get('/login', 'Auth::showLogin');
     $routes->post('/login', 'Auth::login');
     $routes->get('/logout', 'Auth::logout');
+    $routes->get('/forgot-password', 'Auth::forgotPasswordForm');
+    $routes->post('/forgot-password', 'Auth::sendResetLink');
+    $routes->get('/reset-password/(:segment)', 'Auth::resetPasswordForm/$1');
+    $routes->post('/reset-password', 'Auth::updatePassword');
 
     $routes->get('/dashboard', 'Dashboard::index', ['filter' => 'authFilter']);
 
