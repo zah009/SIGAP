@@ -10,6 +10,7 @@ class RegularUserSeeder extends Seeder
     {
         $data = [
             'username'      => 'user1',
+            'email'         => 'musicprojeck910@gmail.com',
             'password_hash' => password_hash('user123', PASSWORD_DEFAULT),
             'role'          => 'user',
             'nama_lengkap'  => 'User Divisi Keuangan',
