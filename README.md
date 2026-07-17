@@ -12,6 +12,10 @@ Departemen IT di banyak perusahaan masih menerima laporan gangguan secara tidak 
 - Autentikasi berbasis session dengan role `user` dan `admin`
 - Proteksi akses berbasis role lewat Filter (route admin tidak bisa diakses user biasa maupun yang belum login, teruji di dua skenario: belum login dan login-tapi-salah-role)
 - Proteksi CSRF aktif di seluruh form
+- Rate limiting pada percobaan login (mencegah brute-force), dua lapis:
+  - Per-IP: maksimal 20 percobaan login/menit dari satu alamat IP (mencegah scanning banyak akun sekaligus)
+  - Per-akun: maksimal 2 percobaan/menit ke satu username spesifik dari IP yang sama (mencegah brute-force ke satu akun)
+- Reset password mandiri lewat email — user klik "lupa password", menerima tautan berisi token acak (di-hash SHA-256, berlaku 1 jam) untuk membuat password baru. Pesan konfirmasi disamarkan (sama baik email terdaftar atau tidak) untuk mencegah user enumeration
 
 **Untuk User**
 - Membuat laporan gangguan (kategori, judul, deskripsi) lengkap dengan lampiran file (JPG/PNG/PDF, maks 2MB)
@@ -35,6 +39,7 @@ Departemen IT di banyak perusahaan masih menerima laporan gangguan secara tidak 
 - **Database:** MySQL/MariaDB (XAMPP untuk development)
 - **Frontend:** HTML, Tailwind CSS v4 (standalone CLI)
 - **Email:** CodeIgniter Email Service (SMTP, testing via Mailtrap)
+- **Deployment:** AWS EC2
 
 ## Struktur Database
 
@@ -91,15 +96,17 @@ Akses di `http://localhost:8080`.
 | Admin | testadmin | test123  |
 | User  | user1     | user123  |
 
-## Roadmap
+## Status Pengembangan
+
+Seluruh fitur yang direncanakan sudah selesai diimplementasikan:
 
 - [x] Styling dengan Tailwind CSS
 - [x] Notifikasi email saat status tiket berubah
 - [x] Upload lampiran file pada tiket
 - [x] Manajemen user oleh admin
-- [ ] Deployment ke AWS EC2
-- [ ] Rate limiting pada percobaan login (mencegah brute-force)
-- [ ] Reset password lewat email (saat ini admin menentukan password awal user secara langsung)
+- [x] Deployment ke AWS EC2
+- [x] Rate limiting pada percobaan login (mencegah brute-force)
+- [x] Reset password lewat email
 
 ## Lisensi
 
