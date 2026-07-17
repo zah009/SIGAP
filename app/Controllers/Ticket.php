@@ -24,9 +24,12 @@ class Ticket extends BaseController
 
     public function create()
 {
-    
-
     if ($block = $this->blockAdmin()) return $block;
+
+    if ($this->request->getGet('error') === 'filesize') {
+        session()->setFlashdata('errors', ['Ukuran file yang diupload terlalu besar. Maksimal 2MB.']);
+    }
+
     return view('tickets/create');
 }
 
@@ -49,7 +52,23 @@ public function store()
     $lampiranName = null;
     $file = $this->request->getFile('lampiran');
 
-    if ($file && $file->isValid() && !$file->hasMoved()) {
+    // Ada file yang dicoba diupload (bukan field kosong)
+    if ($file && $file->getError() !== UPLOAD_ERR_NO_FILE) {
+
+        // File ditolak di level PHP (misal melebihi upload_max_filesize/post_max_size)
+        // sebelum sempat dicek getSize() di bawah — sebelumnya kasus ini diam-diam
+        // membuat tiket tanpa lampiran tanpa memberi tahu user.
+        if (!$file->isValid()) {
+            return redirect()->to('/tickets/create')
+                ->withInput()
+                ->with('errors', ['Ukuran file yang diupload terlalu besar. Maksimal 2MB.']);
+        }
+
+        if ($file->hasMoved()) {
+            return redirect()->to('/tickets/create')
+                ->withInput()
+                ->with('errors', ['Terjadi kesalahan saat memproses lampiran. Silakan coba lagi.']);
+        }
 
         $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
         $realMime = $file->getMimeType();
