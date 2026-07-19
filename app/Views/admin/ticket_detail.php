@@ -24,7 +24,22 @@
             📎 Lihat Lampiran
         </a>
     </p>
-<?php endif; ?>
+    <?php endif; ?>
+
+    <?php if ($ticket['status'] === 'in_progress' && !empty($ticket['sla_deadline'])): ?>
+        <p class="text-sm mt-4 pt-4 border-t border-gray-100">
+            Target penyelesaian (<?= $ticket['sla_hours'] ?> jam):
+            <strong class="sla-countdown font-mono" data-deadline="<?= strtotime($ticket['sla_deadline']) ?>">menghitung...</strong>
+        </p>
+    <?php elseif ($ticket['status'] === 'closed' && !empty($ticket['sla_deadline'])): ?>
+        <?php $onTime = strtotime($ticket['updated_at']) <= strtotime($ticket['sla_deadline']); ?>
+        <p class="text-sm mt-4 pt-4 border-t border-gray-100">
+            SLA <?= $ticket['sla_hours'] ?> jam —
+            <span class="<?= $onTime ? 'text-green-600' : 'text-red-600' ?> font-medium">
+                <?= $onTime ? 'Selesai tepat waktu' : 'Selesai melewati batas waktu' ?>
+            </span>
+        </p>
+    <?php endif; ?>
 </div>
 
 <?php if (session()->getFlashdata('error')): ?>
@@ -36,14 +51,19 @@
     <form action="/admin/tickets/<?= $ticket['id'] ?>/update" method="post">
         <?= csrf_field() ?>
 
-        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 text-sm mb-3">
+        <select name="status" id="statusSelect" class="border border-gray-300 rounded-md px-3 py-2 text-sm mb-3">
             <option value="open" <?= $ticket['status'] === 'open' ? 'selected' : '' ?>>Open</option>
             <option value="in_progress" <?= $ticket['status'] === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
             <option value="closed" <?= $ticket['status'] === 'closed' ? 'selected' : '' ?>>Closed</option>
         </select>
 
+        <div id="slaField" class="mb-3" style="display:none;">
+            <label class="block text-sm font-medium mb-1">Estimasi Penyelesaian (jam)</label>
+            <input type="number" name="sla_hours" min="1" class="border border-gray-300 rounded-md px-3 py-2 text-sm w-32" placeholder="misal: 48">
+        </div>
+
         <textarea name="catatan" placeholder="Catatan penanganan (wajib diisi)" rows="3"
-          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm mb-3"><?= esc(old('catatan')) ?></textarea>
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm mb-3"></textarea>
 
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-md transition">
             Update
@@ -65,5 +85,17 @@
         </ul>
     <?php endif; ?>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var statusSelect = document.getElementById('statusSelect');
+    var slaField = document.getElementById('slaField');
+    function toggleSla() {
+        slaField.style.display = statusSelect.value === 'in_progress' ? 'block' : 'none';
+    }
+    statusSelect.addEventListener('change', toggleSla);
+    toggleSla();
+});
+</script>
 
 <?= $this->include('partials/footer') ?>

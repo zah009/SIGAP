@@ -12,8 +12,9 @@ class TicketModel extends Model
     protected $returnType       = 'array';
 
     protected $allowedFields = [
-        'user_id', 'kategori', 'judul', 'deskripsi',
-        'status', 'lampiran', 'created_at', 'updated_at',
+    'user_id', 'kategori', 'judul', 'deskripsi',
+    'status', 'lampiran', 'created_at', 'updated_at',
+    'sla_hours', 'sla_deadline', 'sla_notified',
     ];
 
     protected $useTimestamps = true;

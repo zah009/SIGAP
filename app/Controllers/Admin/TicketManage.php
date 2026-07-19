@@ -43,8 +43,9 @@ class TicketManage extends BaseController
             return redirect()->to('/admin/dashboard')->with('error', 'Tiket tidak ditemukan.');
         }
 
-        $status  = $this->request->getPost('status');
-        $catatan = $this->request->getPost('catatan');
+        $status   = $this->request->getPost('status');
+        $catatan  = $this->request->getPost('catatan');
+        $slaHours = $this->request->getPost('sla_hours');
 
         if (!in_array($status, ['open', 'in_progress', 'closed'])) {
             return redirect()->back()->with('error', 'Status tidak valid.');
@@ -54,7 +55,18 @@ class TicketManage extends BaseController
             return redirect()->back()->with('error', 'Catatan wajib diisi setiap update status.');
         }
 
-        $this->ticketModel->update($id, ['status' => $status]);
+        $updateData = ['status' => $status];
+
+        if ($status === 'in_progress') {
+            if (empty($slaHours) || !is_numeric($slaHours) || $slaHours <= 0) {
+                return redirect()->back()->with('error', 'Masukkan estimasi waktu penyelesaian (jam) saat mengubah status ke In Progress.');
+            }
+            $updateData['sla_hours']    = (int) $slaHours;
+            $updateData['sla_deadline'] = date('Y-m-d H:i:s', strtotime("+{$slaHours} hours"));
+            $updateData['sla_notified'] = 0;
+        }
+
+        $this->ticketModel->update($id, $updateData);
 
         $this->logModel->insert([
             'ticket_id' => $id,
