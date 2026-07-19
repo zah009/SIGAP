@@ -6,62 +6,51 @@
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# OS X Thumbnails
 ._*
 
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-
-# Recycle Bin used on file shares
 $RECYCLE.BIN/
-
-# Windows Installer files
 *.cab
 *.msi
 *.msm
 *.msp
-
-# Windows shortcuts
 *.lnk
 
 # Linux
 *~
-
-# KDE directory preferences
 .directory
-
-# Linux trash folder which might appear on any partition or disk
 .Trash-*
 
 #-------------------------
 # Environment Files
 #-------------------------
-# These should never be under version control,
-# as it poses a security risk.
 .env
 .vagrant
 Vagrantfile
 
 #-------------------------
-# Temporary Files
+# Writable folders — simpan struktur folder, buang isinya
 #-------------------------
 /writable/cache/*
-!/writable/cache/index.html
+!/writable/cache/.gitkeep
 
 /writable/logs/*
-!/writable/logs/index.html
+!/writable/logs/.gitkeep
 
 /writable/session/*
-!/writable/session/index.html
-
-/writable/uploads/*
-!/writable/uploads/index.html
+!/writable/session/.gitkeep
 
 /writable/debugbar/*
-!/writable/debugbar/index.html
+!/writable/debugbar/.gitkeep
+
+/writable/uploads/*
+!/writable/uploads/.gitkeep
+
+!/writable/.htaccess
+!/writable/index.html
 
 php_errors.log
 
@@ -77,8 +66,6 @@ php_errors.log
 # Test Files
 #-------------------------
 /tests/coverage*
-
-# Don't save phpunit under version control.
 /phpunit
 
 #-------------------------
@@ -89,18 +76,10 @@ vendor/
 #-------------------------
 # IDE / Development Files
 #-------------------------
-
-# Modules Testing
 _modules/*
-
-# phpenv local config
 .php-version
-
-# Jetbrains editors (PHPStorm, etc)
 .idea/
 *.iml
-
-# NetBeans
 /nbproject/
 /build/
 /nbbuild/
@@ -109,8 +88,6 @@ _modules/*
 /nbactions.xml
 /nb-configuration.xml
 /.nb-gradle/
-
-# Sublime Text
 *.tmlanguage.cache
 *.tmPreferences.cache
 *.stTheme.cache
@@ -118,18 +95,14 @@ _modules/*
 *.sublime-project
 .phpintel
 /api/
-
-# Visual Studio Code
 .vscode/
 
 /results/
 /phpunit.xml
-/vendor/
-/writable/*
-!/writable/.htaccess
-!/writable/index.html
-.env
-
 *.exe
+
+#-------------------------
+# Upload lampiran tiket
+#-------------------------
 public/uploads/tickets/*
 !public/uploads/tickets/.gitkeep
