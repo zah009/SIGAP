@@ -45,6 +45,7 @@
                     <th class="px-4 py-3 font-medium">Kategori</th>
                     <th class="px-4 py-3 font-medium">Status</th>
                     <th class="px-4 py-3 font-medium">Dibuat</th>
+                    <th class="px-4 py-3 font-medium">Target Penyelesaian</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-line">
@@ -65,6 +66,18 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 font-mono text-xs text-ink/50"><?= esc($t['created_at']) ?></td>
+                        <td class="px-4 py-3 font-mono text-xs">
+                            <?php if ($t['status'] === 'in_progress' && !empty($t['sla_deadline'])): ?>
+                                <span class="sla-countdown" data-deadline="<?= strtotime($t['sla_deadline']) ?>">menghitung...</span>
+                            <?php elseif ($t['status'] === 'closed' && !empty($t['sla_deadline'])): ?>
+                                <?php $onTime = strtotime($t['updated_at']) <= strtotime($t['sla_deadline']); ?>
+                                <span class="<?= $onTime ? 'text-green-600' : 'text-red-600' ?>">
+                                    <?= $onTime ? 'Tepat waktu' : 'Terlambat' ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="text-ink/30">—</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
